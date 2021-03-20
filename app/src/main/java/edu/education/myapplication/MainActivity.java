@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
     private LastUpdated lastUpdate;
     private InternetDetails internetDetails;
     private DatabaseHandler databaseHandler;
+    private DatabaseHandler databaseHandlerTemp;
 
     @Override
     protected void onStop() {
@@ -226,6 +227,7 @@ public class MainActivity extends AppCompatActivity {
         if ((isMobileDataEnabled() || isWiFiEnabled()) && internetDetails.getConnectionDetails()) {
             FindMe findMe = new FindMe(this);
             findMe.getAccessPointLocations(this);
+            databaseHandlerTemp = new DatabaseHandler(this);
             if (databaseHandler.getAccessPointCount() > 0) {
                 locationUploaderStatus.setText("Location points Updated successfully. Please Confirm this in admin panel");
                 locationUploaderStatus.setTextColor(getResources().getColor(R.color.darkGreen));
