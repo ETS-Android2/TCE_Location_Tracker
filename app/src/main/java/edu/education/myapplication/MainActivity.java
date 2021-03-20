@@ -1,5 +1,6 @@
 package edu.education.myapplication;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ActivityOptions;
@@ -9,6 +10,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkCapabilities;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -26,6 +30,8 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -49,11 +55,18 @@ public class MainActivity extends AppCompatActivity {
     private TextView lastMode;
     private ImageView lastImage;
 
+    private TextView download;
+    private TextView locationUploaderStatus;
+
     private LinearLayout openCamera;
     private LinearLayout adminAdmin;
+    private LinearLayout locationLoaderLayout;
+    private LinearLayout reloadLocationLoader;
 
     private GPSTracker gpsTracker;
     private LastUpdated lastUpdate;
+    private InternetDetails internetDetails;
+    private DatabaseHandler databaseHandler;
 
     @Override
     protected void onStop() {
@@ -61,11 +74,11 @@ public class MainActivity extends AppCompatActivity {
         handler.removeCallbacks(runnable);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onStart() {
         super.onStart();
-        FindMe findMe = new FindMe(this);
-        findMe.getAccessPointLocations(this);
+        loadAccessPointLoader();
     }
 
     @Override
@@ -84,6 +97,12 @@ public class MainActivity extends AppCompatActivity {
         lastPosition = findViewById(R.id.lastPosition);
         lastMode = findViewById(R.id.lastMode);
         lastImage = findViewById(R.id.lastUploadedImage);
+
+        download = findViewById(R.id.downloadSpeed);
+        locationUploaderStatus = findViewById(R.id.locationStatus);
+
+        locationLoaderLayout = findViewById(R.id.locationLoaderLayout);
+        reloadLocationLoader = findViewById(R.id.reloadLocationLoader);
 
         openCamera = findViewById(R.id.openCamera);
         openCamera.setOnClickListener(new View.OnClickListener() {
@@ -105,8 +124,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        reloadLocationLoader.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadAccessPointLoader();
+            }
+        });
+
         gpsTracker = new GPSTracker(this);
         lastUpdate = new LastUpdated(this);
+        internetDetails = new InternetDetails(this);
+        databaseHandler = new DatabaseHandler(this);
 
         systemUId.setText(getSystemUniqueId());
 
@@ -143,10 +171,20 @@ public class MainActivity extends AppCompatActivity {
     private void runTimer() {
         handler = new Handler();
         runnable = new Runnable() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void run() {
 
                 Location location = gpsTracker.getLocation();
+
+                if (internetDetails.getConnectionDetails()) {
+                    download.setText("Online");
+                    download.setTextColor(getResources().getColor(R.color.darkGreen));
+                } else {
+                    download.setText("Offline");
+                    download.setTextColor(getResources().getColor(R.color.darkred));
+                }
+
 
                 currentDateAndTime.setText(getCurrentDateAndTime());
                 latitude.setText(String.valueOf(gpsTracker.getLatitude()));
@@ -173,4 +211,77 @@ public class MainActivity extends AppCompatActivity {
         handler.postDelayed(runnable,1000);
 
     }
+
+    private void loadAccessPointLoader() {
+
+
+        /*ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
+
+        double downloadSpeed = networkCapabilities.getLinkDownstreamBandwidthKbps();
+        double uploadSpeed = networkCapabilities.getLinkUpstreamBandwidthKbps();
+
+        System.out.println(String.valueOf(downloadSpeed) + " Upload: ");*/
+
+        if ((isMobileDataEnabled() || isWiFiEnabled()) && internetDetails.getConnectionDetails()) {
+            FindMe findMe = new FindMe(this);
+            findMe.getAccessPointLocations(this);
+            if (databaseHandler.getAccessPointCount() > 0) {
+                locationUploaderStatus.setText("Location points Updated successfully. Please Confirm this in admin panel");
+                locationUploaderStatus.setTextColor(getResources().getColor(R.color.darkGreen));
+            } else {
+                locationUploaderStatus.setText("Couldn't Load locations. Please retry or Check local database");
+                locationUploaderStatus.setTextColor(getResources().getColor(R.color.darkred));
+            }
+        } else {
+            locationUploaderStatus.setText("No Internet. You are offline");
+            locationUploaderStatus.setTextColor(getResources().getColor(R.color.darkred));
+        }
+    }
+
+    /*----------------------------------------------------------------------------------------------
+                        Check if the Mobile data is Switched ON or OFF
+    ----------------------------------------------------------------------------------------------*/
+    public boolean isMobileDataEnabled() {
+
+        boolean isEnabled = false;
+
+        ConnectivityManager connectivityManager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        try {
+            Class mClass = Class.forName(connectivityManager.getClass().getName());
+            Method method = mClass.getDeclaredMethod("getMobileDataEnabled");
+            method.setAccessible(true);
+            isEnabled = (boolean) method.invoke(connectivityManager);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        return isEnabled;
+
+    }
+    //----------------------------------------------------------------------------------------------
+
+
+    /*----------------------------------------------------------------------------------------------
+                            Check if the WIFI is Switched ON or OFF
+    ----------------------------------------------------------------------------------------------*/
+    public boolean isWiFiEnabled() {
+
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+        if (wifiManager.isWifiEnabled()) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+    //----------------------------------------------------------------------------------------------
+
 }

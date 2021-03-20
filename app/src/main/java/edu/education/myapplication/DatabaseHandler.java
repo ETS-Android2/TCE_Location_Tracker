@@ -60,6 +60,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     //----------------------------------------------------------------------------------------------
 
     /*----------------------------------------------------------------------------------------------
+            GET THE NUMBER OF ACCESS POINTS LOADED ITO THE LOCAL DATABASE FROM SERVER
+    ----------------------------------------------------------------------------------------------*/
+    public int getAccessPointCount() {
+        SQLiteDatabase database = this.getReadableDatabase();
+        Cursor cursor = database.rawQuery("SELECT COUNT(*) FROM locations",null);
+        if (cursor != null) {
+            return cursor.getCount();
+        } else {
+            return 0;
+        }
+    }
+    //----------------------------------------------------------------------------------------------
+
+    /*----------------------------------------------------------------------------------------------
                Upload location into local database incase of internet or Server Failure
     ----------------------------------------------------------------------------------------------*/
     public boolean uploadLocation(String currentTime, double latitude, double longitude, String postion) {

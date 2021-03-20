@@ -75,6 +75,24 @@
 
     <LinearLayout
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingTop="10dp"
+        android:paddingHorizontal="10dp">
+
+        <TextView
+            android:id="@+id/downloadSpeed"
+            android:layout_marginHorizontal="2dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:text="download"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
@@ -89,6 +107,68 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    app:cardElevation="10dp"
+                    app:cardCornerRadius="10dp"
+                    android:layout_marginHorizontal="10dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="10dp"
+                        android:paddingTop="15dp"
+                        android:paddingBottom="5dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Location Access Points are loaded Successfully"
+                            android:gravity="center"
+                            android:id="@+id/locationStatus"/>
+
+
+                        <LinearLayout
+                            android:id="@+id/locationLoaderLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="right"
+                            android:orientation="vertical">
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginVertical="5dp"
+                                android:background="#ccc" />
+                            <LinearLayout
+                                android:id="@+id/reloadLocationLoader"
+                                android:clickable="true"
+                                android:layout_width="wrap_content"
+                                android:layout_height="40dp"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:paddingHorizontal="10dp"
+                                android:background="?selectableItemBackground">
+
+                                <ImageView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/ic_action_retry"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Reload"/>
+
+                            </LinearLayout>
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
                     android:layout_marginTop="15dp"

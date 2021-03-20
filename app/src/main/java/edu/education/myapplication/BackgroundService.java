@@ -460,7 +460,7 @@ public class BackgroundService extends Service {
     /*----------------------------------------------------------------------------------------------
                         Check if the Mobile data is Switched ON or OFF
     ----------------------------------------------------------------------------------------------*/
-    private boolean isMobileDataEnabled() {
+    public boolean isMobileDataEnabled() {
 
         boolean isEnabled = false;
 
@@ -489,7 +489,7 @@ public class BackgroundService extends Service {
     /*----------------------------------------------------------------------------------------------
                             Check if the WIFI is Switched ON or OFF
     ----------------------------------------------------------------------------------------------*/
-    private boolean isWiFiEnabled() {
+    public boolean isWiFiEnabled() {
 
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
