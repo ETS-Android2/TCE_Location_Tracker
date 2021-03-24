@@ -1,119 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_marginVertical="10dp"
-    android:layout_marginHorizontal="10dp"
-    app:cardElevation="10dp"
-    app:cardCornerRadius="10dp">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ImageLister"
+    android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/successful"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
         android:orientation="vertical"
-        android:paddingVertical="15dp"
-        android:paddingHorizontal="10dp">
+        android:gravity="center">
 
         <androidx.cardview.widget.CardView
-            android:layout_width="75dp"
-            android:layout_height="75dp"
-            app:cardCornerRadius="50dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="10dp"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginVertical="15dp"
             app:cardElevation="10dp">
 
-            <ImageView
-                android:layout_width="75dp"
-                android:layout_height="75dp"
-                android:src="@drawable/success"/>
+            <LinearLayout
+                android:padding="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/success"/>
+
+                <TextView
+                    android:paddingVertical="15dp"
+                    android:textStyle="bold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Successfull \n All the data has been uploaded into Server database"/>
+
+            </LinearLayout>
 
         </androidx.cardview.widget.CardView>
 
-        <TextView
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/lister"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Date and Time"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:layout_marginTop="15dp"/>
-        <TextView
-            android:id="@+id/dateTimeStamp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="xx-xx-xxxx xx:xx:xx"
-            android:gravity="center"/>
-
-        <LinearLayout
-            android:layout_marginTop="10dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="1">
-
-            <LinearLayout
-                android:layout_weight="0.5"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Latitude"
-                    android:textStyle="bold"
-                    android:gravity="center"/>
-
-                <TextView
-                    android:id="@+id/latitude"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="xx.xxxxxxxx"
-                    android:gravity="center"/>
-
-            </LinearLayout>
-
-            <View
-                android:layout_width="1dp"
-                android:layout_height="match_parent"/>
-
-            <LinearLayout
-                android:layout_weight="0.5"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Longitude"
-                    android:textStyle="bold"
-                    android:gravity="center"/>
-
-                <TextView
-                    android:id="@+id/longitude"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="xx.xxxxxxxx"
-                    android:gravity="center"/>
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Location Status"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:layout_marginTop="10dp"/>
-        <TextView
-            android:id="@+id/status"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="xxxxx xxxxxx xxxxxx xxxxx xxx xx xx xxxx xx xx"/>
+            android:layout_height="match_parent"/>
 
     </LinearLayout>
 
-</androidx.cardview.widget.CardView>
+</LinearLayout>

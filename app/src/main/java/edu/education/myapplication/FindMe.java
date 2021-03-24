@@ -26,8 +26,9 @@ public class FindMe {
         this.context = context;
     }
 
-    private static final String ACCESS_POINT_LOCATIONS_DATA_URL = "http://192.168.43.225/locationtracker/index.php/welcome/getAccessPoints";
-    //private static final String ACCESS_POINT_LOCATIONS_DATA_URL = "http://tltms.tce.edu/locationtracker/index.php/welcome/getAccessPoints";
+    private static final String ACCESS_POINT_LOCATIONS_DATA_URL = "http://192.168.43.89/locationtracker/index.php/welcome/getAccessPoints";
+    //private static final String ACCESS_POINT_LOCATIONS_DATA_URL = "https://tltms.tce.edu/tracker/locationtracker/index.php/welcome/getAccessPoints";
+
     //Code to Upload location Access Points into Local database
     public void getAccessPointLocations(final Context context) {
 
@@ -36,13 +37,17 @@ public class FindMe {
 
         databaseHandler = new DatabaseHandler(context);
 
-        databaseHandler.deleteAccessPointTable();
+        if (databaseHandler.getAccessPointCount() > 0) {
+            databaseHandler.deleteAccessPointTable();
+        }
+
 
         requestQueue = Volley.newRequestQueue(context);
         objectRequest = new JsonObjectRequest(Request.Method.POST, ACCESS_POINT_LOCATIONS_DATA_URL, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
+                    System.out.println(response);
                     JSONArray jsonArray = response.getJSONArray("data");
                     for (int i=0; i<jsonArray.length(); i++) {
                         JSONObject jsonObject = jsonArray.getJSONObject(i);

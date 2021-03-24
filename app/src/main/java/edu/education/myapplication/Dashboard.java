@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 
 public class Dashboard extends AppCompatActivity {
 
+    private LinearLayout newLocation;
     private LinearLayout locationLister;
     private LinearLayout imageLister;
     private LinearLayout accessPointsLister;
@@ -19,9 +20,17 @@ public class Dashboard extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
+        newLocation = findViewById(R.id.newLocation);
         locationLister = findViewById(R.id.location);
         imageLister = findViewById(R.id.image);
         accessPointsLister = findViewById(R.id.accessDatabase);
+
+        newLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
 
         locationLister.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -35,7 +44,9 @@ public class Dashboard extends AppCompatActivity {
         imageLister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(Dashboard.this, ImageLister.class);
+                ActivityOptions activityOptions = ActivityOptions.makeCustomAnimation(getApplicationContext(),R.anim.fade_out,R.anim.fade_in);
+                startActivity(intent,activityOptions.toBundle());
             }
         });
 

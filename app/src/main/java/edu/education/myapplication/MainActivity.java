@@ -228,7 +228,9 @@ public class MainActivity extends AppCompatActivity {
             FindMe findMe = new FindMe(this);
             findMe.getAccessPointLocations(this);
             databaseHandlerTemp = new DatabaseHandler(this);
-            if (databaseHandler.getAccessPointCount() > 0) {
+            Toast.makeText(getApplicationContext(),String.valueOf(databaseHandler.getAccessPointCount()),Toast.LENGTH_LONG).show();
+            System.out.println("Counter : " + databaseHandlerTemp.getAccessPointCount());
+            if (databaseHandlerTemp.getAccessPointCount() > 0) {
                 locationUploaderStatus.setText("Location points Updated successfully. Please Confirm this in admin panel");
                 locationUploaderStatus.setTextColor(getResources().getColor(R.color.darkGreen));
             } else {

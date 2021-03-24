@@ -36,10 +36,10 @@ import java.util.Map;
 public class BackgroundService extends Service {
 
     //private static final String UPLOAD_LOCATION_INTO_SERVER_DATABASE = "https://tltms.tce.edu/tracker/locationtracker/index.php/welcome/updateLocation";
-    private static final String UPLOAD_LOCATION_INTO_SERVER_DATABASE = "http://192.168.43.225/locationtracker/index.php/welcome/updateLocation";
+    private static final String UPLOAD_LOCATION_INTO_SERVER_DATABASE = "http://192.168.43.89/locationtracker/index.php/welcome/updateLocation";
 
     //private static final String UPLOAD_IMAGE_INTO_SERVER_URL = "https://tltms.tce.edu/tracker/locationtracker/index.php/welcome/uploadImage";
-    private static final String UPLOAD_IMAGE_INTO_SERVER_URL = "http://192.168.43.225/locationtracker/index.php/welcome/uploadImage";
+    private static final String UPLOAD_IMAGE_INTO_SERVER_URL = "http://192.168.43.89/locationtracker/index.php/welcome/uploadImage";
 
     protected static final int NOTIFICATION_ID = 1337;
 
@@ -199,7 +199,7 @@ public class BackgroundService extends Service {
                 if (currentTimeInHours >= 7 && currentTimeInHours < 8) {
                     //change the runner timer
                     //upload the un-uploaded content
-                    DELAY_RUNNABLE_TIMER = 60 * 30 * 1000;  //-- Runs every 30 Minutes
+                    DELAY_RUNNABLE_TIMER = 60 * 10 * 1000;  //-- Runs every 30 Minutes
                     Toast.makeText(getApplicationContext(),String.valueOf(databaseHandler.getLocationCount()),Toast.LENGTH_SHORT).show();
                     if (databaseHandler.getLocationCount() > 0) {
                         //---------------- send unloaded location into server ----------------------

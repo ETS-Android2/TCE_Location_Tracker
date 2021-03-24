@@ -41,7 +41,7 @@ import java.util.Map;
 public class CameraActivity extends AppCompatActivity {
 
     //private static final String UPLOAD_IMAGE_INTO_SERVER_URL = "https://tltms.tce.edu/tracker/locationtracker/index.php/welcome/uploadImage";
-    private static final String UPLOAD_IMAGE_INTO_SERVER_URL = "http://192.168.43.225/locationtracker/index.php/welcome/uploadImage";
+    private static final String UPLOAD_IMAGE_INTO_SERVER_URL = "http://192.168.43.89/locationtracker/index.php/welcome/uploadImage";
 
     private LinearLayout goBackButton;
     private LinearLayout success;

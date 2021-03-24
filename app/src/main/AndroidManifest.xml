@@ -22,7 +22,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".AccessPoints"></activity>
+        <activity android:name=".NewLocation"></activity>
+        <activity android:name=".AccessPoints" />
         <activity android:name=".ImageLister" />
         <activity android:name=".LocationLister" />
         <activity android:name=".Dashboard" />

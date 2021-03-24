@@ -64,7 +64,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     ----------------------------------------------------------------------------------------------*/
     public int getAccessPointCount() {
         SQLiteDatabase database = this.getReadableDatabase();
-        Cursor cursor = database.rawQuery("SELECT COUNT(*) FROM locations",null);
+        Cursor cursor = database.rawQuery("SELECT * FROM locations",null);
         if (cursor != null) {
             return cursor.getCount();
         } else {
@@ -108,7 +108,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     ----------------------------------------------------------------------------------------------*/
     public int getLocationCount() {
         SQLiteDatabase database = this.getReadableDatabase();
-        Cursor cursor = database.rawQuery("SELECT COUNT(*) FROM user_location", null);
+        Cursor cursor = database.rawQuery("SELECT * FROM user_location", null);
         if (cursor != null) {
             return cursor.getCount();
         } else {
@@ -163,7 +163,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     ----------------------------------------------------------------------------------------------*/
     public int getImageCount() {
         SQLiteDatabase database = this.getReadableDatabase();
-        Cursor cursor = database.rawQuery("SELECT COUNT(*) FROM user_image",null);
+        Cursor cursor = database.rawQuery("SELECT * FROM user_image",null);
         if (cursor != null) {
             return cursor.getCount();
         } else {
@@ -191,5 +191,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return cursor;
     }
     //----------------------------------------------------------------------------------------------
+
+    public int getCount() {
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+        sqLiteDatabase.rawQuery("SELECT COUNT(*) FROM locations",null);
+        return 0;
+    }
 
 }
