@@ -26,8 +26,13 @@ public class FindMe {
         this.context = context;
     }
 
-    private static final String ACCESS_POINT_LOCATIONS_DATA_URL = "http://192.168.43.89/locationtracker/index.php/welcome/getAccessPoints";
-    //private static final String ACCESS_POINT_LOCATIONS_DATA_URL = "https://tltms.tce.edu/tracker/locationtracker/index.php/welcome/getAccessPoints";
+    //private static final String ACCESS_POINT_LOCATIONS_DATA_URL = "http://192.168.43.89/locationtracker/index.php/welcome/getAccessPoints";
+    private static final String ACCESS_POINT_LOCATIONS_DATA_URL = "https://tltms.tce.edu/tracker/locationtracker/index.php/welcome/getAccessPoints";
+
+    public int getAccessPointerCounter() {
+        databaseHandler = new DatabaseHandler(context);
+        return databaseHandler.getAccessPointCount();
+    }
 
     //Code to Upload location Access Points into Local database
     public void getAccessPointLocations(final Context context) {
@@ -37,6 +42,7 @@ public class FindMe {
 
         databaseHandler = new DatabaseHandler(context);
 
+        System.out.println("Location Count : " + databaseHandler.getAccessPointCount());
         if (databaseHandler.getAccessPointCount() > 0) {
             databaseHandler.deleteAccessPointTable();
         }
@@ -58,6 +64,7 @@ public class FindMe {
                         double minimumDistance = Double.parseDouble(jsonObject.getString("min"));
                         databaseHandler.uploadAccessPoints(latitude, longitude, locationName, minimumDistance);
                     }
+                    System.out.println("Location Counter : " + databaseHandler.getAccessPointCount());
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -69,7 +76,6 @@ public class FindMe {
             }
         });
         requestQueue.add(objectRequest);
-
     }
 
     public String getLocationStatus(double latitude, double longitude) {
