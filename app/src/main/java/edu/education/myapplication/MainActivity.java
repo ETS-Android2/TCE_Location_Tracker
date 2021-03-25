@@ -13,6 +13,7 @@ import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -26,9 +27,19 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -38,6 +49,9 @@ import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    //private static final String ACCESS_POINT_LOCATIONS_DATA_URL = "http://192.168.43.89/locationtracker/index.php/welcome/getAccessPoints";
+    private static final String ACCESS_POINT_LOCATIONS_DATA_URL = "https://tltms.tce.edu/tracker/locationtracker/index.php/welcome/getAccessPoints";
 
     private Handler handler;
     private Runnable runnable;
@@ -225,18 +239,76 @@ public class MainActivity extends AppCompatActivity {
         System.out.println(String.valueOf(downloadSpeed) + " Upload: ");*/
 
         if ((isMobileDataEnabled() || isWiFiEnabled()) && internetDetails.getConnectionDetails()) {
-            FindMe findMe = new FindMe(this);
-            findMe.getAccessPointLocations(this);
-            databaseHandlerTemp = new DatabaseHandler(this);
+
+
+            /*FindMe findMe = new FindMe(MainActivity.this);
+            findMe.getAccessPointLocations(MainActivity.this);*/
+
+            locationUploaderStatus.setText("fetching");
+            locationUploaderStatus.setTextColor(getResources().getColor(R.color.black));
+
+            RequestQueue requestQueue;
+            JsonObjectRequest objectRequest;
+
+            databaseHandler = new DatabaseHandler(MainActivity.this);
+
+            System.out.println("Location Count : " + databaseHandler.getAccessPointCount());
+            if (databaseHandler.getAccessPointCount() > 0) {
+                databaseHandler.deleteAccessPointTable();
+            }
+
+
+            requestQueue = Volley.newRequestQueue(MainActivity.this);
+            objectRequest = new JsonObjectRequest(Request.Method.POST, ACCESS_POINT_LOCATIONS_DATA_URL, null, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        System.out.println(response);
+                        JSONArray jsonArray = response.getJSONArray("data");
+                        for (int i=0; i<jsonArray.length(); i++) {
+                            JSONObject jsonObject = jsonArray.getJSONObject(i);
+                            //complete the code
+                            double latitude = Double.parseDouble(jsonObject.getString("latitude"));
+                            double longitude = Double.parseDouble(jsonObject.getString("longitude"));
+                            String locationName = jsonObject.getString("name");
+                            double minimumDistance = Double.parseDouble(jsonObject.getString("min"));
+                            databaseHandler.uploadAccessPoints(latitude, longitude, locationName, minimumDistance);
+                        }
+                        System.out.println("Location Counter : " + databaseHandler.getAccessPointCount());
+                        if (databaseHandler.getAccessPointCount() > 0) {
+                            locationUploaderStatus.setText("Location points Updated successfully. Please Confirm this in admin panel");
+                            locationUploaderStatus.setTextColor(getResources().getColor(R.color.darkGreen));
+                        } else {
+                            locationUploaderStatus.setText("Couldn't Load locations. Please retry or Check local database");
+                            locationUploaderStatus.setTextColor(getResources().getColor(R.color.darkred));
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        locationUploaderStatus.setText("Couldn't Load locations. Please retry or Check local database");
+                        locationUploaderStatus.setTextColor(getResources().getColor(R.color.darkred));
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(getApplicationContext(), "Access point Error", Toast.LENGTH_LONG).show();
+                    locationUploaderStatus.setText("Couldn't Load locations. Please retry or Check local database");
+                    locationUploaderStatus.setTextColor(getResources().getColor(R.color.darkred));
+                }
+            });
+            requestQueue.add(objectRequest);
+
+            /*databaseHandlerTemp = new DatabaseHandler(MainActivity.this);
             Toast.makeText(getApplicationContext(),String.valueOf(databaseHandler.getAccessPointCount()),Toast.LENGTH_LONG).show();
-            System.out.println("Counter : " + databaseHandlerTemp.getAccessPointCount());
-            if (databaseHandlerTemp.getAccessPointCount() > 0) {
+            System.out.println("Counter : " + databaseHandlerTemp.getAccessPointCount());/
+
+            /*if (databaseHandlerTemp.getAccessPointCount() > 0) {
                 locationUploaderStatus.setText("Location points Updated successfully. Please Confirm this in admin panel");
                 locationUploaderStatus.setTextColor(getResources().getColor(R.color.darkGreen));
             } else {
                 locationUploaderStatus.setText("Couldn't Load locations. Please retry or Check local database");
                 locationUploaderStatus.setTextColor(getResources().getColor(R.color.darkred));
-            }
+            }*/
         } else {
             locationUploaderStatus.setText("No Internet. You are offline");
             locationUploaderStatus.setTextColor(getResources().getColor(R.color.darkred));
@@ -287,5 +359,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
     //----------------------------------------------------------------------------------------------
+
+    public class LoadAccessLocation extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            return null;
+        }
+    }
 
 }
