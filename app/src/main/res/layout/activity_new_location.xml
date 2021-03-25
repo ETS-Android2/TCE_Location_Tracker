@@ -5,9 +5,54 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
     android:orientation="vertical"
     tools:context=".NewLocation">
+
+    <LinearLayout
+        android:paddingTop="15dp"
+        android:paddingHorizontal="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <TextView
+            android:gravity="center"
+            android:layout_weight="0.5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Last Updated : "/>
+
+        <TextView
+            android:id="@+id/lastUpdated"
+            android:layout_weight="0.5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""/>
+
+    </LinearLayout>
+    <LinearLayout
+        android:paddingHorizontal="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <TextView
+            android:gravity="center"
+            android:layout_weight="0.5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Next Update in : "/>
+
+        <TextView
+            android:id="@+id/nextUpdate"
+            android:layout_weight="0.5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""/>
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_weight="1"
@@ -102,6 +147,7 @@
                     android:textSize="12sp"/>
 
                 <EditText
+                    android:enabled="false"
                     android:id="@+id/latitude"
                     android:layout_marginTop="3dp"
                     android:layout_width="match_parent"
@@ -121,6 +167,7 @@
                     android:textSize="12sp"/>
 
                 <EditText
+                    android:enabled="false"
                     android:id="@+id/longitude"
                     android:layout_marginTop="3dp"
                     android:layout_width="match_parent"

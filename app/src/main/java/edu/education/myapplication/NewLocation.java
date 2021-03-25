@@ -1,8 +1,13 @@
 package edu.education.myapplication;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.location.Location;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,6 +22,13 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import java.text.DateFormat;
+import java.text.FieldPosition;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,11 +46,30 @@ public class NewLocation extends AppCompatActivity {
     private EditText locationStatus;
     private EditText accuracy;
 
+    private Runnable timerRunnable;
+    private Handler timerHandler;
+    private TextView lastUploaded;
+    private TextView nextUpdate;
+    private Runnable locationRunnable;
+    private Handler locationHandler;
+    private GPSTracker gpsTracker;
+
+    private Date date;
+    private int timer;
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        locationHandler.removeCallbacks(locationRunnable);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_location);
 
+        lastUploaded = findViewById(R.id.lastUpdated);
+        nextUpdate = findViewById(R.id.nextUpdate);
         postLocation = findViewById(R.id.addLocation);
         status = findViewById(R.id.status);
         statusText = findViewById(R.id.statusText);
@@ -47,6 +78,46 @@ public class NewLocation extends AppCompatActivity {
         longitude = findViewById(R.id.longitude);
         locationStatus = findViewById(R.id.locationStatus);
         accuracy = findViewById(R.id.accuracy);
+
+        gpsTracker = new GPSTracker(this);
+
+        timer = 30;
+
+        timerHandler = new Handler();
+        timerRunnable = new Runnable() {
+            @Override
+            public void run() {
+                nextUpdate.setText(String.valueOf(timer) + "s");
+                timer--;
+                timerHandler.postDelayed(timerRunnable, 1000);
+            }
+        };
+        timerHandler.postDelayed(timerRunnable, 1000);
+        locationHandler = new Handler();
+        locationRunnable = new Runnable() {
+            @Override
+            public void run() {
+                latitude.setText(String.valueOf(gpsTracker.getLatitude()));
+                longitude.setText(String.valueOf(gpsTracker.getLongitude()));
+
+                lastUploaded.setText(getCurrentDateAndTime());
+                timer = 30;
+                /**timerRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        locationStatus.setText(String.valueOf(timer));
+                        timer--;
+                        timerHandler.postDelayed(timerRunnable, 1000);
+                    }
+                };
+                timerHandler.postDelayed(timerRunnable, 1000);*/
+
+                locationHandler.postDelayed(locationRunnable, 30000);
+            }
+        };
+        timer = 30;
+        locationHandler.postDelayed(locationRunnable, 30000);
+        System.gc();
 
         postLocation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,5 +180,11 @@ public class NewLocation extends AppCompatActivity {
             }
         });
 
+    }
+
+    private String getCurrentDateAndTime() {
+        date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return simpleDateFormat.format(date);
     }
 }
