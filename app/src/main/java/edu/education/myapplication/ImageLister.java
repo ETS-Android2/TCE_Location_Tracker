@@ -41,9 +41,13 @@ public class ImageLister extends AppCompatActivity {
         details = new ArrayList<>();
         adapter = new ImageListerAdapter(this, details);
 
+        recyclerView.setAdapter(adapter);
+
         unUploadedImageCount = databaseHandler.getImageCount();
 
-        if (unUploadedImageCount <= 0) {
+        System.out.println("Image Count : " + unUploadedImageCount );
+
+        if (unUploadedImageCount == 0) {
             successful.setVisibility(View.VISIBLE);
             lister.setVisibility(View.GONE);
         } else {
