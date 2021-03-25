@@ -6,175 +6,185 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
+    android:orientation="vertical"
     tools:context=".NewLocation">
 
-    <androidx.cardview.widget.CardView
+    <LinearLayout
+        android:layout_weight="1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="10dp"
-        app:cardElevation="10dp"
-        android:layout_margin="10dp">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center">
 
-        <LinearLayout
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingVertical="15dp"
-            android:paddingHorizontal="7dp"
-            android:orientation="vertical">
+            app:cardCornerRadius="10dp"
+            app:cardElevation="10dp"
+            android:layout_margin="10dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:weightSum="1">
-
-                <LinearLayout
-                    android:layout_weight="0.2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <LinearLayout
-                        android:id="@+id/status"
-                        android:visibility="invisible"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@color/green"
-                        android:paddingVertical="5dp">
-
-                        <TextView
-                            android:id="@+id/statusText"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:gravity="center"
-                            android:textSize="12sp"
-                            android:text="Added Location Successfully"/>
-
-                    </LinearLayout>
-
-                </LinearLayout>
+                android:paddingVertical="15dp"
+                android:paddingHorizontal="7dp"
+                android:orientation="vertical">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.8"
-                    android:padding="2dp">
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:weightSum="1">
+
+                    <LinearLayout
+                        android:layout_weight="0.2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <LinearLayout
+                            android:id="@+id/status"
+                            android:visibility="invisible"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@color/green"
+                            android:paddingVertical="5dp">
+
+                            <TextView
+                                android:id="@+id/statusText"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:textSize="12sp"
+                                android:text="Added Location Successfully"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/button_bg"
-                        android:id="@+id/addLocation"
-                        android:clickable="true">
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.8"
+                        android:padding="2dp">
 
-                        <TextView
+                        <Button
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Post"
-                            android:textColor="#fff"
-                            android:padding="3dp"
-                            android:gravity="center"/>
+                            android:background="@drawable/button_bg"
+                            android:id="@+id/addLocation"
+                            android:text="Post">
+
+                            <!--<TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:text="Post"
+                                android:textColor="#fff"
+                                android:padding="3dp"
+                                android:gravity="center"/>-->
+
+                        </Button>
 
                     </LinearLayout>
 
                 </LinearLayout>
 
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#ccc"
-                android:layout_marginVertical="10dp"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Latitude"
-                android:textSize="12sp"/>
-
-            <EditText
-                android:id="@+id/latitude"
-                android:layout_marginTop="3dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberDecimal"
-                android:background="@drawable/input_border"
-                android:paddingVertical="5dp"
-                android:paddingHorizontal="10dp"
-                android:hint="Latitude"
-                android:textSize="14sp"/>
-
-            <TextView
-                android:layout_marginTop="10dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Longitude"
-                android:textSize="12sp"/>
-
-            <EditText
-                android:id="@+id/longitude"
-                android:layout_marginTop="3dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberDecimal"
-                android:background="@drawable/input_border"
-                android:paddingVertical="5dp"
-                android:paddingHorizontal="10dp"
-                android:hint="Longitude"
-                android:textSize="14sp"/>
-
-            <TextView
-                android:layout_marginTop="10dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Location Status"
-                android:textSize="12sp"/>
-
-            <EditText
-                android:id="@+id/locationStatus"
-                android:layout_marginTop="3dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:background="@drawable/input_border"
-                android:paddingVertical="5dp"
-                android:paddingHorizontal="10dp"
-                android:hint="ex: CSE Department"
-                android:textSize="14sp"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="10dp"
-                android:gravity="center_vertical"
-                android:weightSum="1">
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#ccc"
+                    android:layout_marginVertical="10dp"/>
 
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="Min dist (Accuracy) in meters"
-                    android:textSize="12sp"
-                    android:gravity="center_vertical"
-                    android:layout_weight="0.5"/>
+                    android:layout_height="wrap_content"
+                    android:text="Latitude"
+                    android:textSize="12sp"/>
 
                 <EditText
-                    android:id="@+id/accuracy"
-                    android:layout_weight="0.5"
+                    android:id="@+id/latitude"
+                    android:layout_marginTop="3dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number"
+                    android:inputType="numberDecimal"
                     android:background="@drawable/input_border"
                     android:paddingVertical="5dp"
                     android:paddingHorizontal="10dp"
-                    android:hint="ex: 50"
-                    android:textSize="14sp"/>
+                    android:hint="Latitude"
+                    style="@style/adminInputField"/>
+
+                <TextView
+                    android:layout_marginTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Longitude"
+                    android:textSize="12sp"/>
+
+                <EditText
+                    android:id="@+id/longitude"
+                    android:layout_marginTop="3dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:background="@drawable/input_border"
+                    android:paddingVertical="5dp"
+                    android:paddingHorizontal="10dp"
+                    android:hint="Longitude"
+                    style="@style/adminInputField"/>
+
+                <TextView
+                    android:layout_marginTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Location Status"
+                    android:textSize="12sp"/>
+
+                <EditText
+                    android:id="@+id/locationStatus"
+                    android:layout_marginTop="3dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:background="@drawable/input_border"
+                    android:paddingVertical="5dp"
+                    android:paddingHorizontal="10dp"
+                    android:hint="ex: CSE Department"
+                    style="@style/adminInputField"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center_vertical"
+                    android:weightSum="1">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="Min dist (Accuracy) in meters"
+                        android:textSize="12sp"
+                        android:gravity="center_vertical"
+                        android:layout_weight="0.5"/>
+
+                    <EditText
+                        android:id="@+id/accuracy"
+                        android:layout_weight="0.5"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:background="@drawable/input_border"
+                        android:paddingVertical="5dp"
+                        android:paddingHorizontal="10dp"
+                        android:hint="ex: 50"
+                        style="@style/adminInputField"/>
+
+                </LinearLayout>
 
             </LinearLayout>
 
-        </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
-    </androidx.cardview.widget.CardView>
-
+    </LinearLayout>
+    
 </LinearLayout>
