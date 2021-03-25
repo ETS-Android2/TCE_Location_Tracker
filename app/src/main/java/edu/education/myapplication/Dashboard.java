@@ -28,7 +28,9 @@ public class Dashboard extends AppCompatActivity {
         newLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(Dashboard.this, NewLocation.class);
+                ActivityOptions activityOptions = ActivityOptions.makeCustomAnimation(getApplicationContext(),R.anim.fade_out,R.anim.fade_in);
+                startActivity(intent,activityOptions.toBundle());
             }
         });
 
