@@ -21,7 +21,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String CREATE_TABLE_QUERY = "create table user_location (up_date TEXT NOT NULL, latitude DOUBLE NOT NULL, longitude DOUBLE NOT NULL, position TEXT NOT NULL)";
         String CREATE_IMAGE_QUERY = "create table user_image (up_date TEXT NOT NULL, latitude DOUBLE NOT NULL, longitude DOUBLE NOT NULL, position TEXT NOT NULL, image TEXT NOT NULL)";
-        String CREATE_LOCATION_ACCESS_POINTS_QUERY = "create table locations (latitude DOUBLE NOT NULL, longitude DOUBLE NOT NULL, name TEXT NOT NULL, minimum DOUBLE NOT NULL)";
+        String CREATE_LOCATION_ACCESS_POINTS_QUERY = "create table locations (latitude DOUBLE NOT NULL, longitude DOUBLE NOT NULL, name TEXT UNIQUE NOT NULL, minimum DOUBLE NOT NULL)";
 
         //------------------------------- CREATE TABLE QUERY ---------------------------------------
         db.execSQL(CREATE_TABLE_QUERY);

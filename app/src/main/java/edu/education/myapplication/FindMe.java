@@ -43,9 +43,9 @@ public class FindMe {
         databaseHandler = new DatabaseHandler(context);
 
         System.out.println("Location Count : " + databaseHandler.getAccessPointCount());
-        if (databaseHandler.getAccessPointCount() > 0) {
+        /*if (databaseHandler.getAccessPointCount() > 0) {
             databaseHandler.deleteAccessPointTable();
-        }
+        }*/
 
 
         requestQueue = Volley.newRequestQueue(context);
