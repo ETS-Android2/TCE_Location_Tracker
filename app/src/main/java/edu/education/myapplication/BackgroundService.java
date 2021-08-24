@@ -36,10 +36,10 @@ import java.util.Map;
 public class BackgroundService extends Service {
 
     private static final String UPLOAD_LOCATION_INTO_SERVER_DATABASE = "https://tltms.tce.edu/tracker/locationtracker/index.php/welcome/updateLocation";
-    //private static final String UPLOAD_LOCATION_INTO_SERVER_DATABASE = "http://192.168.43.89/locationtracker/index.php/welcome/updateLocation";
+    //private static final String UPLOAD_LOCATION_INTO_SERVER_DATABASE = "http://192.168.111.89/locationtracker/index.php/welcome/updateLocation";
 
     private static final String UPLOAD_IMAGE_INTO_SERVER_URL = "https://tltms.tce.edu/tracker/locationtracker/index.php/welcome/uploadImage";
-    //private static final String UPLOAD_IMAGE_INTO_SERVER_URL = "http://192.168.43.89/locationtracker/index.php/welcome/uploadImage";
+    //private static final String UPLOAD_IMAGE_INTO_SERVER_URL = "http://192.168.111.89/locationtracker/index.php/welcome/uploadImage";
 
     protected static final int NOTIFICATION_ID = 1337;
 
@@ -56,6 +56,8 @@ public class BackgroundService extends Service {
     private FindMe findMe;
 
     private String lastUploadedTime = "";
+
+    private static boolean isActivityRestarted = false;
 
 
     /*----------------------------------------------------------------------------------------------
@@ -75,6 +77,8 @@ public class BackgroundService extends Service {
     //----------------------------- Local database and Update location -----------------------------
     private DatabaseHandler databaseHandler;
 
+    private InternetDetails internetDetails;
+
     public BackgroundService() {
         super();
     }
@@ -85,6 +89,7 @@ public class BackgroundService extends Service {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             restartForeground();
+            isActivityRestarted = true;
         }
 
         currentService = this;
@@ -95,18 +100,18 @@ public class BackgroundService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
-        Toast.makeText(getApplicationContext(),"Session restarting",Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(),"Session restarting",Toast.LENGTH_LONG).show();
+        System.out.println("Session Restarting.");
 
         if (intent == null) {
             ProcessMainClass processMainClass = new ProcessMainClass();
             processMainClass.launchService(this);
+            startLocationService();
         }
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             restartForeground();
         }
-
-        startLocationService();
 
         return START_STICKY;
 
@@ -121,15 +126,18 @@ public class BackgroundService extends Service {
     public void restartForeground() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Toast.makeText(getApplicationContext(),"Restarting Foreground Setvice",Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(),"Restarting Foreground Setvice",Toast.LENGTH_LONG).show();
+            System.out.println("Restarting Foreground Service");
 
             try {
                 BackgroundNotification notification = new BackgroundNotification();
                 startForeground(NOTIFICATION_ID, notification.sendNotification(this,"Service Notification","App is running in background",R.drawable.ic_gps_location));
-                Toast.makeText(getApplicationContext(),"Restarted Successfully",Toast.LENGTH_LONG).show();
+                //Toast.makeText(getApplicationContext(),"Restarted Successfully",Toast.LENGTH_LONG).show();
+                System.out.println("Restarted Successfully");
                 startLocationService();
             } catch (Exception e) {
-                Toast.makeText(getApplicationContext(),"Error in Notification",Toast.LENGTH_LONG).show();
+                //Toast.makeText(getApplicationContext(),"Error in Notification",Toast.LENGTH_LONG).show();
+                System.out.println("Error In Notification");
             }
 
         }
@@ -162,7 +170,8 @@ public class BackgroundService extends Service {
     private static JSONObject jsonObject;
 
     public void startLocationService() {
-        Toast.makeText(getApplicationContext(),"Location Service started",Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(),"Location Service started",Toast.LENGTH_LONG).show();
+        System.out.println("Location Service Started");
 
         SYSTEM_UNIQUE_IDENTIFICATION_ID = getSystemUniqueId();
 
@@ -179,8 +188,10 @@ public class BackgroundService extends Service {
     //---------------------------- GET LOCATION AND OTHER OPERATIONS -------------------------------
     public void initializeLocationService() {
 
-        Toast.makeText(getApplicationContext(),"Initialising Location Service",Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(),"Initialising Location Service",Toast.LENGTH_LONG).show();
+        System.out.println("Initialising Location Service");
 
+        internetDetails = new InternetDetails(getApplicationContext());
         gpsTracker = new GPSTracker(getApplicationContext());
         databaseHandler = new DatabaseHandler(this);
         findMe = new FindMe(this);
@@ -196,7 +207,7 @@ public class BackgroundService extends Service {
 
                 int currentTimeInHours = getCurrentTimeInHours();
 
-                if (currentTimeInHours >= 7 && currentTimeInHours < 8) {
+                /*if (currentTimeInHours >= 7 && currentTimeInHours < 8) {
                     //change the runner timer
                     //upload the un-uploaded content
                     DELAY_RUNNABLE_TIMER = 60 * 10 * 1000;  //-- Runs every 30 Minutes
@@ -212,45 +223,58 @@ public class BackgroundService extends Service {
                     }
                 }
                 //------------------- Executes when the time is >4pm and <9am ----------------------
-                else {
+                else {*/
 
-                    DELAY_RUNNABLE_TIMER = 30 * 1000;       //-- Runs Every 20 Seconds
+                if (internetDetails.getConnectionDetails()) {
+                    //Toast.makeText(getApplicationContext(),String.valueOf(databaseHandler.getLocationCount()),Toast.LENGTH_SHORT).show();
+                    if (databaseHandler.getLocationCount() > 0) {
+                        //---------------- send unloaded location into server ----------------------
+                        uploadFailedLocations(databaseHandler.getLocation());
+                    }
 
-                    if (gpsTracker.canGetLocation) {
-
-                        Location location = gpsTracker.getLocation();
-
-                        if (location != null) {
-
-                            double latitude = gpsTracker.getLatitude();
-                            double longitude = gpsTracker.getLongitude();
-                            String status = "";
-                            String dateTimeStamp = "";
-
-                            status = findMe.getLocationStatus(latitude, longitude);
-
-                            dateTimeStamp = getCurrentTime();
-
-                            if (!isMobileDataEnabled() && !isWiFiEnabled()) {
-                                updateLocalDatabase(latitude, longitude, status, dateTimeStamp);
-                                Toast.makeText(getApplicationContext(),"Mobile Data Swirched off",Toast.LENGTH_LONG).show();
-                            } else {
-                                //Code to upload data into Server
-                                updateServerDatabase(latitude, longitude, status, dateTimeStamp);
-                                //updateLocalDatabase(latitude, longitude, status, dateTimeStamp);
-                            }
-
-                        } else {
-                            //------------------- SEND ERROR MESSAGE TO SERVER -------------------------
-                            Toast.makeText(getApplicationContext(),"Location error",Toast.LENGTH_LONG).show();
-                        }
-
-                        //databaseHandler.uploadLocation("currentTime",location.getLatitude(), location.getLongitude(),"Position");
-
-                    } else {
-                        Toast.makeText(getApplicationContext(),"Cannot Get Location",Toast.LENGTH_LONG).show();
+                    //upload the un-uploaded images
+                    if (databaseHandler.getImageCount() > 0) {
+                        uploadFailedImage(databaseHandler.getImage());
                     }
                 }
+
+                DELAY_RUNNABLE_TIMER = 30 * 1000;       //-- Runs Every 20 Seconds
+
+                if (gpsTracker.canGetLocation) {
+
+                    Location location = gpsTracker.getLocation();
+
+                    if (location != null) {
+
+                        double latitude = gpsTracker.getLatitude();
+                        double longitude = gpsTracker.getLongitude();
+                        String status = "";
+                        String dateTimeStamp = "";
+
+                        status = findMe.getLocationStatus(latitude, longitude);
+
+                        dateTimeStamp = getCurrentTime();
+
+                        if (!isMobileDataEnabled() && !isWiFiEnabled()) {
+                            updateLocalDatabase(latitude, longitude, status, dateTimeStamp);
+                            Toast.makeText(getApplicationContext(),"Mobile Data Swirched off",Toast.LENGTH_LONG).show();
+                        } else {
+                            //Code to upload data into Server
+                            updateServerDatabase(latitude, longitude, status, dateTimeStamp);
+                            //updateLocalDatabase(latitude, longitude, status, dateTimeStamp);
+                        }
+
+                    } else {
+                        //------------------- SEND ERROR MESSAGE TO SERVER -------------------------
+                        Toast.makeText(getApplicationContext(),"Location error",Toast.LENGTH_LONG).show();
+                    }
+
+                    //databaseHandler.uploadLocation("currentTime",location.getLatitude(), location.getLongitude(),"Position");
+
+                } else {
+                    Toast.makeText(getApplicationContext(),"Cannot Get Location",Toast.LENGTH_LONG).show();
+                }
+                //}
 
                 handler.postDelayed(this, DELAY_RUNNABLE_TIMER);
             }
@@ -296,9 +320,11 @@ public class BackgroundService extends Service {
                     Toast.makeText(getApplicationContext(),response,Toast.LENGTH_SHORT).show();
                     System.out.println(response);
                     if (response.equals("ok")) {
-                        Toast.makeText(getApplicationContext(),"Successfull", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(),"Successfull", Toast.LENGTH_LONG).show();
+                        System.out.println("Successful");
                     } else {
-                        Toast.makeText(getApplicationContext(),"Failed", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(),"Failed", Toast.LENGTH_LONG).show();
+                        System.out.println("Failed");
                         updateLocalDatabase(latitude, longitude, status, dataTimeStamp);
                     }
                 }

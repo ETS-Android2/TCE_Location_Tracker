@@ -16,6 +16,8 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
+import com.google.android.gms.location.LocationRequest;
+
 public class GPSTracker extends Service implements LocationListener {
 
     private Context context;
@@ -27,7 +29,7 @@ public class GPSTracker extends Service implements LocationListener {
     double longitude;
 
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 1;
-    private static final long MIN_TIME_BTW_UPDATES = 1000 * 60 * 1;
+    private static final long MIN_TIME_BTW_UPDATES = 1000;
 
     protected LocationManager locationManager;
 
@@ -50,6 +52,11 @@ public class GPSTracker extends Service implements LocationListener {
                         Toast.makeText(context,"Permission is still denied",Toast.LENGTH_LONG).show();
                     } else {
                         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BTW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+
+                        /*LocationRequest locationRequest = LocationRequest.create();
+                        locationRequest.setInterval(10000);
+                        locationRequest.setFastestInterval(5000);
+                        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);*/
 
                         if (locationManager != null) {
                             location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
