@@ -46,7 +46,7 @@ public class adminAuth extends AppCompatActivity {
                     warningMessage.setText("Missing Credentials");
                     warning.setVisibility(View.VISIBLE);
                 } else {
-                    if (Username.equals("admin") && Password.equals("t")) {
+                    if (Username.equals("admin") && Password.equals("admin@tracker")) {
                         Intent intent = new Intent(adminAuth.this, Dashboard.class);
                         ActivityOptions activityOptions = ActivityOptions.makeCustomAnimation(getApplicationContext(),R.anim.fade_out,R.anim.fade_in);
                         startActivity(intent,activityOptions.toBundle());
