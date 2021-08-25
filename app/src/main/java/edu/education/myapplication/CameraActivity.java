@@ -172,6 +172,8 @@ public class CameraActivity extends AppCompatActivity {
 
         } else {
             //upload into local database
+            uploading.setVisibility(View.INVISIBLE);
+            failed.setVisibility(View.VISIBLE);
             databaseHandler.uploadImage(getCurrentDateAndTime(), gpsTracker.getLatitude(), gpsTracker.getLongitude(), findMe.getLocationStatus(gpsTracker.getLatitude(), gpsTracker.getLongitude()), encodeImage(bitmap));
         }
     }
@@ -197,6 +199,7 @@ public class CameraActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case 1000:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {

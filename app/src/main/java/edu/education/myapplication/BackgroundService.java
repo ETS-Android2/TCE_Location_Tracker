@@ -36,10 +36,10 @@ import java.util.Map;
 public class BackgroundService extends Service {
 
     private static final String UPLOAD_LOCATION_INTO_SERVER_DATABASE = "https://tltms.tce.edu/tracker/locationtracker/index.php/welcome/updateLocation";
-    //private static final String UPLOAD_LOCATION_INTO_SERVER_DATABASE = "http://192.168.111.89/locationtracker/index.php/welcome/updateLocation";
+    //private static final String UPLOAD_LOCATION_INTO_SERVER_DATABASE = "http://192.168.43.89/locationtracker/index.php/welcome/updateLocation";
 
     private static final String UPLOAD_IMAGE_INTO_SERVER_URL = "https://tltms.tce.edu/tracker/locationtracker/index.php/welcome/uploadImage";
-    //private static final String UPLOAD_IMAGE_INTO_SERVER_URL = "http://192.168.111.89/locationtracker/index.php/welcome/uploadImage";
+    //private static final String UPLOAD_IMAGE_INTO_SERVER_URL = "http://192.168.43.89/locationtracker/index.php/welcome/uploadImage";
 
     protected static final int NOTIFICATION_ID = 1337;
 
@@ -225,14 +225,19 @@ public class BackgroundService extends Service {
                 //------------------- Executes when the time is >4pm and <9am ----------------------
                 else {*/
 
+                System.out.println("Running");
+                System.out.println("Local Location Count : " + databaseHandler.getLocationCount());
+                System.out.println("Local Images Count : " + databaseHandler.getImageCount());
                 if (internetDetails.getConnectionDetails()) {
                     //Toast.makeText(getApplicationContext(),String.valueOf(databaseHandler.getLocationCount()),Toast.LENGTH_SHORT).show();
+                    //System.out.println("Local Location Count : " + databaseHandler.getLocationCount());
                     if (databaseHandler.getLocationCount() > 0) {
                         //---------------- send unloaded location into server ----------------------
                         uploadFailedLocations(databaseHandler.getLocation());
                     }
 
                     //upload the un-uploaded images
+
                     if (databaseHandler.getImageCount() > 0) {
                         uploadFailedImage(databaseHandler.getImage());
                     }
@@ -317,7 +322,7 @@ public class BackgroundService extends Service {
             stringRequest = new StringRequest(Request.Method.POST, UPLOAD_LOCATION_INTO_SERVER_DATABASE, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    Toast.makeText(getApplicationContext(),response,Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(),response,Toast.LENGTH_SHORT).show();
                     System.out.println(response);
                     if (response.equals("ok")) {
                         //Toast.makeText(getApplicationContext(),"Successfull", Toast.LENGTH_LONG).show();
@@ -372,7 +377,8 @@ public class BackgroundService extends Service {
             position = cursor.getString(3);
 
             if (uploadFailedLocationIntoServer(upDateTime, latitude, longitude, position)) {
-                Toast.makeText(getApplicationContext(),"Success to Delete",Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(),"Success to Delete",Toast.LENGTH_SHORT).show();
+                System.out.println("Success to Delete");
             }
 
             /*if (uploadFailedLocationIntoServer(upDateTime, latitude, longitude, position)) {
@@ -439,7 +445,9 @@ public class BackgroundService extends Service {
         String position;
         String image;
 
+        System.out.println("Called Image Uploader");
         while (imagesData.moveToNext()) {
+            System.out.println("Running loop");
             upTime = imagesData.getString(0);
             latitude = imagesData.getDouble(1);
             longitude = imagesData.getDouble(2);
@@ -455,6 +463,7 @@ public class BackgroundService extends Service {
         stringRequest = new StringRequest(Request.Method.POST, UPLOAD_IMAGE_INTO_SERVER_URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
+                System.out.println("Failed Image Uploading response : " + response);
                 if (response.equals("ok")) {
                     //function to delete the image from local database
                     databaseHandler.deleteImageOnUpdate(upTime);
@@ -479,6 +488,7 @@ public class BackgroundService extends Service {
                 return params;
             }
         };
+        requestQueue.add(stringRequest);
     }
 
     //----------------------------------------------------------------------------------------------
