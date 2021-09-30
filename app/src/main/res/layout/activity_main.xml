@@ -38,6 +38,36 @@
                 android:gravity="right|center_vertical">
 
                 <LinearLayout
+                    android:id="@+id/reUploadImages"
+                    android:clickable="true"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:background="?selectableItemBackground"
+                    android:padding="12dp">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_action_failed_images"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/reUploadLocation"
+                    android:clickable="true"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:background="?selectableItemBackground"
+                    android:padding="12dp">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_action_failed_location"/>
+
+                </LinearLayout>
+
+                <LinearLayout
                     android:id="@+id/admin"
                     android:clickable="true"
                     android:layout_width="52dp"

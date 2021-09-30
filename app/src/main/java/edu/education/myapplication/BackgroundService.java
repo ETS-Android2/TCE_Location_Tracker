@@ -16,6 +16,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -40,6 +41,8 @@ public class BackgroundService extends Service {
 
     private static final String UPLOAD_IMAGE_INTO_SERVER_URL = "https://tltms.tce.edu/tracker/locationtracker/index.php/welcome/uploadImage";
     //private static final String UPLOAD_IMAGE_INTO_SERVER_URL = "http://192.168.43.89/locationtracker/index.php/welcome/uploadImage";
+
+    private static final int TIMEOUT_DURATION = 40000;
 
     protected static final int NOTIFICATION_ID = 1337;
 
@@ -233,17 +236,19 @@ public class BackgroundService extends Service {
                     //System.out.println("Local Location Count : " + databaseHandler.getLocationCount());
                     if (databaseHandler.getLocationCount() > 0) {
                         //---------------- send unloaded location into server ----------------------
+                        System.out.println("Called Location");
                         uploadFailedLocations(databaseHandler.getLocation());
                     }
 
                     //upload the un-uploaded images
 
                     if (databaseHandler.getImageCount() > 0) {
+                        System.out.println("Called Images");
                         uploadFailedImage(databaseHandler.getImage());
                     }
                 }
 
-                DELAY_RUNNABLE_TIMER = 30 * 1000;       //-- Runs Every 20 Seconds
+                DELAY_RUNNABLE_TIMER = 30 * 1000;       //-- Runs Every 30 Seconds
 
                 if (gpsTracker.canGetLocation) {
 
@@ -262,7 +267,7 @@ public class BackgroundService extends Service {
 
                         if (!isMobileDataEnabled() && !isWiFiEnabled()) {
                             updateLocalDatabase(latitude, longitude, status, dateTimeStamp);
-                            Toast.makeText(getApplicationContext(),"Mobile Data Swirched off",Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(),"Mobile Data Switched off",Toast.LENGTH_LONG).show();
                         } else {
                             //Code to upload data into Server
                             updateServerDatabase(latitude, longitude, status, dateTimeStamp);
@@ -351,6 +356,7 @@ public class BackgroundService extends Service {
                     return params;
                 }
             };
+            stringRequest.setRetryPolicy(new DefaultRetryPolicy(TIMEOUT_DURATION, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             requestQueue.add(stringRequest);
 
             lastUploadedTime = dataTimeStamp;
@@ -427,7 +433,7 @@ public class BackgroundService extends Service {
                 return params;
             }
         };
-
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(TIMEOUT_DURATION, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue.add(stringRequest);
 
         return false;
@@ -488,6 +494,7 @@ public class BackgroundService extends Service {
                 return params;
             }
         };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(TIMEOUT_DURATION, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue.add(stringRequest);
     }
 

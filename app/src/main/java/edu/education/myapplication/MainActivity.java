@@ -9,6 +9,7 @@ import android.app.Application;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
@@ -27,11 +28,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
@@ -46,12 +50,23 @@ import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
     //private static final String ACCESS_POINT_LOCATIONS_DATA_URL = "http://192.168.43.89/locationtracker/index.php/welcome/getAccessPoints";
     private static final String ACCESS_POINT_LOCATIONS_DATA_URL = "https://tltms.tce.edu/tracker/locationtracker/index.php/welcome/getAccessPoints";
+
+    private static final String UPLOAD_LOCATION_INTO_SERVER_DATABASE = "https://tltms.tce.edu/tracker/locationtracker/index.php/welcome/updateLocation";
+    //private static final String UPLOAD_LOCATION_INTO_SERVER_DATABASE = "http://192.168.43.89/locationtracker/index.php/welcome/updateLocation";
+
+    private static final String UPLOAD_IMAGE_INTO_SERVER_URL = "https://tltms.tce.edu/tracker/locationtracker/index.php/welcome/uploadImage";
+    //private static final String UPLOAD_IMAGE_INTO_SERVER_URL = "http://192.168.43.89/locationtracker/index.php/welcome/uploadImage";
+
+    private static final int TIMEOUT_DURATION = 40000;
+
 
     private Handler handler;
     private Runnable runnable;
@@ -76,12 +91,17 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout adminAdmin;
     private LinearLayout locationLoaderLayout;
     private LinearLayout reloadLocationLoader;
+    private LinearLayout reUploadLocation;
+    private LinearLayout reUploadImages;
 
     private GPSTracker gpsTracker;
     private LastUpdated lastUpdate;
     private InternetDetails internetDetails;
     private DatabaseHandler databaseHandler;
-    private DatabaseHandler databaseHandlerTemp;
+
+    private RequestQueue requestQueue;
+    private StringRequest stringRequest;
+    private boolean isUploaded;
 
     @Override
     protected void onStop() {
@@ -136,6 +156,27 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, adminAuth.class);
                 ActivityOptions activityOptions = ActivityOptions.makeCustomAnimation(getApplicationContext(),R.anim.fade_out,R.anim.fade_in);
                 startActivity(intent,activityOptions.toBundle());
+            }
+        });
+
+        reUploadLocation = findViewById(R.id.reUploadLocation);
+        reUploadLocation.setVisibility(View.GONE);
+        reUploadImages = findViewById(R.id.reUploadImages);
+        reUploadImages.setVisibility(View.GONE);
+        reUploadLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //function to upload the unloaded files into server
+                DatabaseHandler dbHandler = new DatabaseHandler(MainActivity.this);
+                localStoredLocations(dbHandler.getLocation());
+            }
+        });
+
+        reUploadImages.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatabaseHandler dbHandler = new DatabaseHandler(MainActivity.this);
+                localStoredImages(dbHandler.getImage());
             }
         });
 
@@ -200,6 +241,20 @@ public class MainActivity extends AppCompatActivity {
                     download.setTextColor(getResources().getColor(R.color.darkred));
                 }
 
+                int numberOfLocalImages = databaseHandler.getImageCount();
+                int numberOfLocalLocation = databaseHandler.getLocationCount();
+
+                if (numberOfLocalLocation > 0) {
+                    reUploadLocation.setVisibility(View.VISIBLE);
+                } else {
+                    reUploadLocation.setVisibility(View.GONE);
+                }
+
+                if (numberOfLocalImages > 0) {
+                    reUploadImages.setVisibility(View.VISIBLE);
+                } else {
+                    reUploadImages.setVisibility(View.GONE);
+                }
 
                 currentDateAndTime.setText(getCurrentDateAndTime());
                 latitude.setText(String.valueOf(gpsTracker.getLatitude()));
@@ -296,6 +351,7 @@ public class MainActivity extends AppCompatActivity {
                     locationUploaderStatus.setTextColor(getResources().getColor(R.color.darkred));
                 }
             });
+            objectRequest.setRetryPolicy(new DefaultRetryPolicy(TIMEOUT_DURATION, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             requestQueue.add(objectRequest);
 
             /*databaseHandlerTemp = new DatabaseHandler(MainActivity.this);
@@ -366,6 +422,124 @@ public class MainActivity extends AppCompatActivity {
         protected Void doInBackground(Void... voids) {
             return null;
         }
+    }
+
+    //----------------------------------------------------------------------------------------------
+    public void localStoredImages(Cursor imagesData) {
+        String upTime;
+        double latitude;
+        double longitude;
+        String position;
+        String image;
+
+        System.out.println("Called Image Uploader");
+        while (imagesData.moveToNext()) {
+            System.out.println("Running loop");
+            upTime = imagesData.getString(0);
+            latitude = imagesData.getDouble(1);
+            longitude = imagesData.getDouble(2);
+            position = imagesData.getString(3);
+            image = imagesData.getString(4);
+            uploadFailedImageIntoServer(upTime, latitude, longitude, position, image);
+        }
+    }
+
+    private void uploadFailedImageIntoServer (final String upTime, final double latitude, final double longitude, final String position, final String image) {
+        requestQueue = Volley.newRequestQueue(this);
+        stringRequest = new StringRequest(Request.Method.POST, UPLOAD_IMAGE_INTO_SERVER_URL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                System.out.println("Failed Image Uploading response : " + response);
+                if (response.equals("ok")) {
+                    //function to delete the image from local database
+                    databaseHandler.deleteImageOnUpdate(upTime);
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        })
+        {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("systemId", getSystemUniqueId());
+                params.put("exactTime", upTime);
+                params.put("latitude", Double.toString(latitude));
+                params.put("longitude", Double.toString(longitude));
+                params.put("status", position);
+                params.put("image", image);
+                return params;
+            }
+        };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(TIMEOUT_DURATION, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        requestQueue.add(stringRequest);
+    }
+
+    public void localStoredLocations(Cursor cursor) {
+        String upDateTime;
+        Double latitude;
+        Double longitude;
+        String position;
+
+        while (cursor.moveToNext()) {
+            upDateTime = cursor.getString(0);
+            latitude = Double.parseDouble(cursor.getString(1));
+            longitude = Double.parseDouble(cursor.getString(2));
+            position = cursor.getString(3);
+
+            if (uploadFailedLocationIntoServer(upDateTime, latitude, longitude, position)) {
+                //Toast.makeText(getApplicationContext(),"Success to Delete",Toast.LENGTH_SHORT).show();
+                System.out.println("Success to Delete");
+            }
+
+            /*if (uploadFailedLocationIntoServer(upDateTime, latitude, longitude, position)) {
+                Toast.makeText(getApplicationContext(),"Deletion",Toast.LENGTH_SHORT).show();
+                databaseHandler.deleteLocationOnUpdate(upDateTime);
+            }*/
+        }
+    }
+
+    private boolean uploadFailedLocationIntoServer(final String upDateTime, final double latitude, final double longitude, final String position) {
+
+        isUploaded = false;
+
+        requestQueue = Volley.newRequestQueue(this);
+        stringRequest = new StringRequest(Request.Method.POST, UPLOAD_LOCATION_INTO_SERVER_DATABASE, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                if (response.equals("ok")) {
+                    isUploaded = true;
+                    databaseHandler.deleteLocationOnUpdate(upDateTime);
+                } else {
+                    isUploaded = false;
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+                isUploaded = false;
+            }
+        })
+        {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params = new HashMap<>();
+                params.put("id",getSystemUniqueId());
+                params.put("latitude", Double.toString(latitude));
+                params.put("longitude", Double.toString(longitude));
+                params.put("status",position);
+                params.put("dataTimeStamp",upDateTime);
+                return params;
+            }
+        };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(TIMEOUT_DURATION, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        requestQueue.add(stringRequest);
+
+        return false;
     }
 
 }
